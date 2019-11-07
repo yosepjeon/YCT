@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.yosep.agile.mapper.userMapper">
+	<!-- 2019년 6월 4일 -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 01. 회원 목록 -->
+	<select id="userList"
+		resultType="io.yosep.agile.user.model.dto.UserDTO">
+		SELECT
+		userId,
+		userName,
+		userEmail,
+		regDate,
+		phoneNum,
+		gender,
+		userAddr,
+		deptName,
+		position
+		FROM agile_project_user
+		order by userName
+	</select>
+	
+	<!-- 2019년 6월 11일 -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 회원정보 가져오기 -->
+	<select id="viewUser" resultType="io.yosep.agile.user.model.dto.UserDTO">
+		SELECT
+			userId,
+			userName,
+			gender,
+			regDate,
+			phoneNum,
+			userEmail,
+			userAddr,
+			deptName,
+			position,
+			profileUrl
+		FROM agile_project_user
+		WHERE userId = #{userId} AND userPassword = #{userPassword}
+	</select>
+	
+	<!-- 2019년 6월 18일 -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 대시보드용 회원정보 가져오기 -->
+	<select id="getUserForDashBoard" resultType="io.yosep.agile.user.model.dto.UserDTO">
+		SELECT
+			userId,
+			userName,
+			gender,
+			regDate,
+			phoneNum,
+			userEmail,
+			userAddr,
+			deptName,
+			position,
+			profileUrl
+		FROM agile_project_user
+		WHERE userId = #{userId}
+	</select>
+	<!-- 2019년 6월 4일 -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 02. 회원 등록 -->
+	<insert id="insertUser">
+		INSERT INTO
+		agile_project_user(userId,userPassword,userName,gender,phoneNum,userEmail,userAddr,deptName,position,profileUrl)
+		VALUES(#{userId},#{userPassword},#{userName},#{gender},#{phoneNum},#{userEmail},#{userAddr},#{deptName},#{position},#{profileUrl})
+	</insert>
+
+	<!-- 2019년 6월 10일 -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 03. 같은 아이디있는지 여부 체크 -->
+	<select id="checkSameId" resultType="io.yosep.agile.user.model.dto.UserDTO">
+		SELECT * FROM agile_project_user 
+		WHERE userId=#{userId}
+	</select>
+	
+	<!-- 2019년 06월 11일 -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 04. 아이디, 비밀번호 체크를 통한 로그인 체크 -->
+	<select id="loginCheck" resultType="String">
+		SELECT * FROM agile_project_user
+		WHERE userId = #{userId} AND userPassword = #{userPassword}
+	</select>
+</mapper>

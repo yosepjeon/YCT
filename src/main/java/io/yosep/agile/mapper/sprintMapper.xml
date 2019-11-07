@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.yosep.agile.mapper.sprintMapper">
+	<!-- 2019년 8월 7일 -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 01. 스프린트 목록 -->
+	<select id="sprintList"
+		resultType="io.yosep.agile.sprint.domain.dto.SprintDTO">
+		SELECT * FROM agile_project_project_sprint
+		WHERE projectId =
+		#{projectId}
+	</select>
+
+	<!-- -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 스프린트 제거 -->
+	<delete id="deleteSprint">
+		DELETE from agile_project_project_sprint
+		WHERE
+		sprintId=#{sprintId}
+	</delete>
+
+	<!-- 2019년 8월 7일 -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 02. 스프린트 갯수 -->
+	<select id="sprintCount" resultType="int">
+		SELECT count(*) FROM
+		agile_project_project_sprint
+		WHERE projectId = #{projectId}
+	</select>
+
+	<!-- 2019년 8월 8일 -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 03. 스프린트 생성 -->
+	<insert id="createSprint">
+		INSERT INTO
+		agile_project_project_sprint(sprintId,projectId,sprintName,description,state,startDate,endDate)
+		VALUES(#{sprintId},#{projectId},#{sprintName},#{description},#{state},#{startDate},#{endDate})
+	</insert>
+
+	<select id="viewSprint"
+		resultType="io.yosep.agile.sprint.domain.dto.SprintDTO">
+		SELECT * FROM agile_project_project_sprint
+		WHERE sprintId =
+		#{sprintId}
+	</select>
+
+	<select id="countStartSprintInTheProject" resultType="int">
+		SELECT
+		count(*) FROM agile_project_project_sprint
+		WHERE projectId =
+		#{projectId} AND state like 'run'
+	</select>
+
+	<select id="getStartSprint"
+		resultType="io.yosep.agile.sprint.domain.dto.SprintDTO">
+		SELECT * FROM agile_project_project_sprint
+		WHERE projectId =
+		#{projectId} AND state like 'run'
+	</select>
+
+	<select id="getExpiredSprint" parameterType="String" resultType="String">
+		<![CDATA[
+		SELECT sprintId
+		FROM agile_project_project_sprint
+		WHERE date(endDate) <= date(now())
+		]]>
+		<!-- <![CDATA[
+		SELECT sprintId
+		FROM agile_project_project_sprint
+		WHERE date_format(endDate,'%y-%m-%d') <= #{time}
+		]]> -->
+	</select>
+
+	<update id="startSprint">
+		UPDATE agile_project_project_sprint
+		SET state = 'run'
+		WHERE sprintId = #{sprintId}
+	</update>
+
+</mapper>

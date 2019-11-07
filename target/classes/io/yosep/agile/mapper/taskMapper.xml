@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.yosep.agile.mapper.taskMapper">
+	<!-- 2019년 08월 13일 -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 01. 테스크 목록 -->
+	<select id="taskList" resultType="io.yosep.agile.task.domain.dto.TaskDTO">
+		SELECT * FROM agile_project_project_task
+		WHERE projectId = #{projectId}	
+	</select>
+	
+	<!--  -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 해당 테스크 삭제 -->
+	<delete id="deleteTask">
+		DELETE from agile_project_project_task
+		WHERE taskId = #{taskId}
+	</delete>
+	
+	<!--  -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 해당 테스크 수정 -->
+	<update id="updateTask">
+		UPDATE agile_project_project_task
+		SET sprintId = #{sprintId}, description = #{description}, assignee = #{assignee}, taskPriority = #{taskPriority}
+		WHERE taskId = #{taskId}
+	</update>
+	
+	<update id="updateRealTimeTask">
+		UPDATE agile_project_project_task
+		SET taskStatus = #{taskStatus}
+		WHERE taskId = #{taskId}
+	</update>
+	
+	<!--  -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 테스크 얻기 -->
+	<select id="taskDetail" resultType="io.yosep.agile.task.domain.dto.TaskDTO">
+		SELECT * FROM agile_project_project_task
+		WHERE taskId = #{taskId}
+	</select>
+	
+	<!-- 2019년 08월 13일 -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 02. 테스크 갯수 -->
+	<select id="taskCount" resultType="int">
+		SELECT count(*) FROM agile_project_project_task
+		WHERE projectId = #{projectId}
+	</select>
+	
+	<!-- 2019년 08월 13일 -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 03. 테스크 생성 -->
+	<insert id="createTask">
+		INSERT INTO
+		agile_project_project_task(taskId,sprintId,projectId,taskName,taskStatus,taskPriority,description,assignee,reporter,startDate,endDate)
+		VALUES(#{taskId},#{sprintId},#{projectId},#{taskName},#{taskStatus},#{taskPriority},#{description},#{assignee},#{reporter},#{startDate},#{endDate})
+	</insert>
+	
+	<!--  -->
+	<insert id="insertTaskFile">
+		INSERT INTO 
+		agile_project_project_task_file(fileName,taskId,fileUrl)
+		VALUES(#{fileName},#{taskId},#{fileUrl})
+	</insert>
+	
+	<!--  -->
+	<insert id="insertUserToTask">
+		INSERT INTO
+		agile_project_task_user(userId,taskId)
+		VALUES(#{userId},#{taskId})
+	</insert>
+	
+	<select id="getTaskByStatus" resultType="io.yosep.agile.task.domain.dto.TaskDTO">
+		SELECT * 
+		FROM agile_project_project_task
+		WHERE taskStatus = #{status} AND sprintId = #{sprintId}
+	</select>
+	
+	<select id="getNotProcessTaskFromExpiredSprint" resultType="String">
+		SELECT taskId
+		FROM agile_project_project_task
+		WHERE sprintId = #{sprintId} AND taskStatus NOT LIKE 'done'
+	</select>
+	
+	<update id="changeExpiredSprintToDefaultSprint">
+		UPDATE agile_project_project_task
+		SET sprintId = concat(projectId,'_Sprint#')
+		WHERE taskId = #{taskId}
+	</update>
+</mapper>

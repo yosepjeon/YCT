@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-http://mybatis.org//DTD Mapper 3.0//EN"
+"https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.yosep.agile.mapper.projectMapper">
+	<!-- 2019년 06월 13일 -->
+	<!-- 작성자: 전요셉 -->
+	<!-- 01. 프로젝트 목록 -->
+	<select id="projectList"
+		resultType="io.yosep.agile.project.model.dto.ProjectDTO">
+		SELECT * FROM agile_project_project
+		WHERE projectId LIKE
+		(SELECT concat((SELECT userId FROM agile_project_user
+		WHERE
+		userId=#{userId}),'%'));
+	</select>
+
+	<insert id="createProject">
+		INSERT INTO
+		agile_project_project(projectId,projectName,supervisor,description)
+		VALUES(#{projectId},#{projectName},#{supervisor},#{description})
+	</insert>
+
+	<insert id="insertProjectFile">
+		INSERT INTO
+		agile_project_project_file(fileName,projectId,fileUrl)
+		VALUES(#{fileName},#{projectId},#{fileUrl})
+	</insert>
+
+	<insert id="insertUserToProject">
+		INSERT INTO
+		agile_project_project_user(userId,projectId)
+		VALUES(#{userId},
+		#{projectId})
+	</insert>
+
+	<select id="myOwnProjectList"
+		resultType="io.yosep.agile.project.model.dto.ProjectDTO">
+		SELECT
+		agile_project_project.projectId,agile_project_project.projectName,agile_project_project.regDate,agile_project_project.supervisor,agile_project_project.description
+		FROM agile_project_project JOIN agile_project_project_user
+		ON agile_project_project.projectId =
+		agile_project_project_user.projectId
+		WHERE agile_project_project_user.userId = 'enekelx1';
+		<!-- SELECT * FROM agile_project_project WHERE projectId LIKE (SELECT projectId 
+			FROM agile_project_project_user WHERE userId LIKE #{userId}); -->
+	</select>
+
+	<select id="getUsersInTheProject" resultType="String">
+		SELECT userId FROM
+		agile_project_project_user
+		WHERE #{projectId} = projectId
+	</select>
+</mapper>

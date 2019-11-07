@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:websocket="http://www.springframework.org/schema/websocket"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.2.xsd">
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing 
+		infrastructure -->
+
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+	<annotation-driven />
+
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving 
+		up static resources in the ${webappRoot}/resources directory -->
+	<!-- 리소스 설정 -->
+	<!-- mapping: 가상 경로(상대 경로), location: 리소스가 실제로 저장된 경로 -->
+	<resources mapping="/resources/**" location="/resources/" />
+	<resources mapping="/agile/user/prifile/**"
+		location="/Users/jeon-yoseb/Documents/yosep-spring_agile_cooperation_tool/profiles/" />
+	<resources mapping="/include/**"
+		location="/WEB-INF/views/include/" />
+	<resources mapping="/WEB-INF/profiles/**"
+		location="/WEB-INF/profiles/" />
+
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources 
+		in the /WEB-INF/views directory -->
+	<beans:bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>
+
+	<!-- file upload에 필요한 bean -->
+	<beans:bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- 파일업로드 용량 -->
+		<beans:property name="maxUploadSize" value="10485760" />
+	</beans:bean>
+
+	<!-- file upload를 위한 디렉토리 설정 -->
+	<!-- String uploadPath = new String("업로드 경로") -->
+	<beans:bean id="userProfileUploadPath"
+		class="java.lang.String">
+		<!-- 파일 업로드 디렉토리 -->
+		<beans:constructor-arg
+			value="/Users/jeon-yoseb/documents/yosep-spring_agile_cooperation_tool" />
+	</beans:bean>
+
+	<!-- Swagger 설정 -->
+	<beans:bean id="swagger2Config"
+
+		class="springfox.documentation.swagger2.configuration.Swagger2DocumentationConfiguration"></beans:bean>
+
+
+
+	<default-servlet-handler />
+
+	<resources location="classpath:/META-INF/resources/"
+		mapping="swagger-ui.html"></resources>
+
+	<resources location="classpath:/META-INF/resources/webjars/"
+
+		mapping="/webjars/**"></resources>
+
+	<!-- login interceptor 관련 설정 -->
+	<beans:bean id="loginInterceptor"
+		class="io.yosep.agile.interceptor.LoginInterceptor" />
+	
+	<websocket:handlers>
+		<websocket:mapping handler="kanbanHandler" path="/sprint-kanban"/>
+		<websocket:handshake-interceptors>
+			<beans:bean class="org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor"/>
+		</websocket:handshake-interceptors>
+	</websocket:handlers>
+	
+	<beans:bean id="kanbanHandler" class="io.yosep.agile.socket.KanbanSocket"/>
+
+	<interceptors>
+		<interceptor>
+			<!-- 인터셉터 매핑 url -->
+			<mapping path="/dashboard/*" />
+			<mapping path="/project/*" />
+			<mapping path="/project/viewBackLog/*" />
+			<!-- 참조할 로그인 체크 bean -->
+			<beans:ref bean="loginInterceptor" />
+		</interceptor>
+	</interceptors>
+	
+	<task:scheduler id="jobScheduler" pool-size="10"/>
+	<task:annotation-driven scheduler="jobScheduler" />
+
+	<context:component-scan
+		base-package="io.yosep.agile" />
+
+
+
+</beans:beans>
