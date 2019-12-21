@@ -1,1 +1,1 @@
-# YCT
+# YCT (Yosep Cooperation Tool)
